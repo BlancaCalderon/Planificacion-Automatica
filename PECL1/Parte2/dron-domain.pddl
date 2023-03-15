@@ -1,191 +1,177 @@
+;Header and description
+
 (define (domain dron-strips)
-    (:requirements :strips :typing)
 
-    (:types
-        dron transportador caja persona localizacion contenido num
+;remove requirements that are not needed
+(:requirements :strips :typing )
+
+(:types ;todo: enumerate types and their hierarchy here, e.g. car truck bus - vehicle
+    dron transportador caja persona localizacion contenido num
+)
+
+; un-comment following line if constants are needed
+;(:constants )
+
+(:predicates ;todo: define predicates here
+    (transportador-en ?t - transportador ?l - localizacion)
+    (persona-en ?p - persona ?l - localizacion)
+    (caja-en ?c - caja ?l - localizacion)
+    (caja-en-dron ?c - caja ?d - dron)
+    (dron-en ?d - dron ?l - localizacion)
+
+    (persona-necesita ?p - persona ?ctn - contenido)
+    (persona-tiene ?p - persona ?ctn - contenido)
+
+    (caja-contiene ?c - caja ?ctn - contenido)
+    (caja-disponible ?c)
+
+    (transportador-contiene ?t - transportador ?c - caja)
+    (limite-de ?t - transportador ?n - num)
+    (siguiente ?n1 - num ?n2 - num)
+
+    (dron-tiene ?d - dron ?c - caja)
+    (dron-libre ?d)
+)
+
+
+(:action coger-caja
+    :parameters (
+        ?d - dron
+        ?c - caja
+        ?l - localizacion        
     )
-
-    (:predicates
-        (persona-en ?p - persona ?l - localizacion)
-        (caja-en ?c - caja ?l - localizacion)
-        (dron-en ?d - dron ?l - localizacion)
-        (transportador-en ?t - transportador ?l - localizacion)
-
-        (persona-necesita ?p - persona ?ct - contenido)
-        (persona-tiene ?p - persona ?ct - contenido)
-
-        (caja-contiene ?c - caja ?ct - contenido)
-
-        (dron-tiene-transportador ?d - dron ?t - transportador)
-        (dron-tiene-caja ?d - dron ?c - caja)
+    :precondition (and 
+        (caja-en ?c ?l)
+        (dron-en ?d ?l)
+        (caja-disponible ?c)
         (dron-libre ?d)
-        (siguiente ?n1 ?n2 - num)
-        (transportador-contiene ?t - transportador ?c - caja)
-        (limite-de ?t - transportador ?n - num)
     )
-
-    (:action mover-dron
-        :parameters (
-            ?d - dron 
-            ?from ?to - localizacion
-        )
-        :precondition (and 
-            (dron-en ?d ?from)
-        )
-        :effect (and 
-            (not (dron-en ?d ?from))
-            (dron-en ?d ?to)
-        )
+    :effect (and 
+        (not (dron-libre ?d))
+        (not (caja-en ?c ?l))
+        (caja-en-dron ?c ?d)
+        (dron-tiene ?d ?c)
     )
+)
 
-    (:action coger-caja
-        :parameters (
-            ?d - dron
-            ?c - caja
-            ?ct - contenido
-            ?l - localizacion
-        )
-        :precondition (and 
-            (dron-en ?d ?l)
-            (caja-en ?c ?l)
-            (caja-contiene ?c ?ct)
-            (dron-libre ?d)
-        )
-        :effect (and 
-            (not (caja-en ?c ?l))
-            (not (dron-libre ?d))
-            (dron-tiene-caja ?d ?c)
-        )
+(:action dejar-caja
+    :parameters (
+        ?c - caja
+        ?d - dron
+        ?l - localizacion
     )
-
-    (:action dejar-caja
-        :parameters (
-            ?d - dron
-            ?c - caja
-            ?l - localizacion
-        )
-        :precondition (and 
-            (dron-en ?d ?l)
-            (dron-tiene-caja ?d ?c)
-        )
-        :effect (and 
-            (not (dron-tiene-caja ?d ?c))
-            (caja-en ?c ?l)
-            (dron-libre ?d)
-        )
+    :precondition (and 
+        (dron-en ?d ?l)
+        (dron-tiene ?d ?c)
+        (caja-en-dron ?c ?d)
     )
-
-    (:action entregar-caja
-        :parameters (
-            ?d - dron
-            ?c - caja
-            ?ct - contenido
-            ?l - localizacion
-            ?p - persona
-        )
-        :precondition (and 
-            (persona-en ?p ?l)
-            (dron-en ?d ?l)
-            (dron-tiene-caja ?d ?c)
-            (persona-necesita ?p ?ct)
-            (caja-contiene ?c ?ct)
-        )
-        :effect (and 
-            (not (persona-necesita ?p ?ct))
-            (not (caja-contiene ?c ?ct))
-            (not (dron-tiene-caja ?d ?c))
-            (dron-libre ?d)
-            (persona-tiene ?p ?ct)
-            (caja-en ?c ?l)
-        )
+    :effect (and 
+        (not (dron-tiene ?d ?c))
+        (not (caja-en-dron ?c ?d))
+        (caja-en ?c ?l)
+        (dron-libre ?d)
     )
+)
 
-    (:action poner-caja-en-transportador
-        :parameters (
-            ?t - transportador
-            ?c - caja
-            ?d - dron
-            ?l - localizacion
-            ?nini ?nfin - num
-        )
-        :precondition (and 
-            (transportador-en ?t ?l)
-            (dron-en ?d ?l)
-
-            (dron-tiene-caja ?d ?c)
-            (limite-de ?t ?nini)
-            (siguiente ?nini ?nfin)
-        )
-        :effect (and 
-            (not (dron-tiene-caja ?d ?c))
-            (not (limite-de ?t ?nini))
-            (transportador-contiene ?t ?c)
-            (limite-de ?t ?nfin)
-            (dron-libre ?d)
-        )
+(:action entregar-caja
+    :parameters (
+        ?c - caja
+        ?d - dron
+        ?l - localizacion
+        ?ctn - contenido
+        ?p - persona
     )
-
-    (:action coger-caja-del-transportador
-        :parameters (
-            ?t - transportador
-            ?c - caja
-            ?d - dron
-            ?l - localizacion
-            ?nact ?nant - num 
-        )
-        :precondition (and 
-            (transportador-en ?t ?l)
-            (dron-en ?d ?l)
-
-            (transportador-contiene ?t ?c)
-            (limite-de ?t ?nact)
-            (siguiente ?nant ?nact)
-            (dron-libre ?d)
-        )
-        :effect (and 
-            (not (transportador-contiene ?t ?c))
-            (not (limite-de ?t ?nact))
-            (not (dron-libre ?d))
-            (dron-tiene-caja ?d ?c)
-            (limite-de ?t ?nant)
-        )
+    :precondition (and 
+        (dron-en ?d ?l)
+        (dron-tiene ?d ?c)
+        (persona-en ?p ?l)
+        (caja-disponible ?c)
+        (caja-en-dron ?c ?d)
+        (caja-contiene ?c ?ctn)
     )
-    
-    (:action coger-transportador
-        :parameters (
-            ?t - transportador
-            ?d - dron
-            ?l - localizacion
-        )
-        :precondition (and 
-            (transportador-en ?t ?l)
-            (dron-en ?d ?l)
-
-            (dron-libre ?d)
-        )
-        :effect (and 
-            (not (transportador-en ?t ?l))
-            (not (dron-libre ?d))
-
-            (dron-tiene-transportador ?d ?t)
-        )
+    :effect (and 
+        (not (caja-en-dron ?c ?d))
+        (not (dron-tiene ?d ?c))
+        (not (persona-necesita ?p ?ctn))
+        (persona-tiene ?p ?ctn)
+        (dron-libre ?d)
     )
+)
 
-    (:action dejar-transportador
-        :parameters (
-            ?t - transportador
-            ?d - dron
-            ?l - localizacion
-        )
-        :precondition (and 
-            (dron-en ?d ?l)
-            (dron-tiene-transportador ?d ?t)
-        )
-        :effect (and 
-            (not (dron-tiene-transportador ?d ?t))
-            (dron-libre ?d)
-            (transportador-en ?t ?l)
-        )
+(:action poner-caja-en-transportador
+    :parameters (
+        ?c - caja
+        ?d - dron
+        ?t - transportador
+        ?l - localizacion
+        ?nant - num
+        ?nsig - num
     )
-    
+    :precondition (and 
+        (dron-en ?d ?l)
+        (transportador-en ?t ?l)
+        (caja-en-dron ?c ?d)
+        (caja-disponible ?c)
+        (limite-de ?t ?nant)
+        (siguiente ?nant ?nsig)
+    )
+    :effect (and 
+        (not (caja-en-dron ?c ?d))
+        (not (dron-tiene ?d ?c))
+        (not (limite-de ?t ?nant))
+        (transportador-contiene ?t ?c)
+        (limite-de ?t ?nsig)
+        (dron-libre ?d)
+    )
+)
+
+(:action coger-caja-de-transportador
+    :parameters (
+        ?c - caja
+        ?d - dron
+        ?t - transportador
+        ?l - localizacion
+        ?nant - num
+        ?nact - num
+    )
+    :precondition (and 
+        (dron-en ?d ?l)
+        (transportador-en ?t ?l)
+        (transportador-contiene ?t ?c)
+        (dron-libre ?d)
+        (caja-disponible ?c)
+        (limite-de ?t ?nact)
+    )
+    :effect (and 
+        (not (dron-libre ?d))
+        (not (limite-de ?t ?nact))
+        (not (transportador-contiene ?t ?c))
+        (dron-tiene ?d ?c)
+        (caja-en-dron ?c ?d)
+        (limite-de ?t ?nant)
+    )
+)
+
+(:action mover-transportador
+    :parameters (
+        ?t - transportador
+        ?d - dron
+        ?to - localizacion
+        ?from - localizacion
+    )
+    :precondition (and 
+        (dron-en ?d ?from)
+        (transportador-en ?t ?from)
+        (dron-libre ?d)
+    )
+    :effect (and 
+        (not (transportador-en ?t ?from))
+        (not (dron-en ?d ?from))
+        (transportador-en ?t ?to)
+        (dron-en ?d ?to)
+    )
+)
+
+
+
 )
