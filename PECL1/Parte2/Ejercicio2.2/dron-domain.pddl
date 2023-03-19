@@ -1,15 +1,12 @@
-;Header and description
-
 (define (domain dron-strips)
-
-;remove requirements that are not needed
-(:requirements :strips :typing :fluents :action-costs)
-
-(:types ;todo: enumerate types and their hierarchy here, e.g. car truck bus - vehicle
+(:requirements 
+    :strips :typing :fluents :action-costs
+)
+(:types 
     dron transportador caja persona localizacion contenido num
 )
 
-(:predicates ;todo: define predicates here
+(:predicates 
     (transportador-en ?t - transportador ?l - localizacion)
     (persona-en ?p - persona ?l - localizacion)
     (caja-en ?c - caja ?l - localizacion)
@@ -32,7 +29,7 @@
 
 (:functions
     (total-cost)
-    (fly-cost ?from - localizacion ?to - localizacion)
+    (fly-cost ?from ?to - localizacion)
 )
 
 (:action mover_dron
@@ -193,8 +190,5 @@
         (dron-en ?d ?to)
         (increase (total-cost) (fly-cost ?from ?to))
     )
-)
 
-
-
-)
+))

@@ -341,11 +341,19 @@ def main():
             f.write("\t(= (total-cost) 0)\n")
 
         f.write("\n")
-        for i in range(1, len(location) + 1):
-            for j in range(1, len(location) + 1):
-                if (i != j):
+        for i in range(0, len(location) + 1):
+            for j in range(0, len(location) + 1):
+
+                if (i == 0 and j != 0):
                     distance= flight_cost(location_coords, i, j)
-                    f.write("\t(= (fly-cost loc" + str(i) + " loc" + str(j) + ") " + str(distance) + ")\n")
+                    f.write("\t(= (fly-cost deposito loc" + str(j) + ") " + str(distance) + ")\n")
+
+                elif (i != j):
+                    distance= flight_cost(location_coords, i, j)
+                    if (j == 0):
+                        f.write("\t(= (fly-cost loc" + str(i) + " deposito) " + str(distance) + ")\n")
+                    else:
+                        f.write("\t(= (fly-cost loc" + str(i) + " loc" + str(j) + ") " + str(distance) + ")\n")
 
         f.write(")\n")
 
