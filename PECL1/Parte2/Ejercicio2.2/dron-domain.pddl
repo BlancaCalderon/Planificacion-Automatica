@@ -1,6 +1,6 @@
 (define (domain dron-strips)
 (:requirements 
-    :strips :typing :fluents :action-costs
+    :strips :typing :action-costs
 )
 (:types 
     dron transportador caja persona localizacion contenido num
