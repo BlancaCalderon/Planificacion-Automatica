@@ -307,6 +307,8 @@ def main():
             f.write("\t(dron-en " + i + " deposito)\n")
         for i in crate:
             f.write("\t(caja-en " + i + " deposito)\n")
+        for i in crate:
+            f.write("\t(caja-disponible " + i + " )\n")
         for i in person:
             f.write("\t(persona-en " + i + " " + random.choice(location) + ")\n")
         for i in carrier:

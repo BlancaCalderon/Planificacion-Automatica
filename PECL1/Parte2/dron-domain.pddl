@@ -33,6 +33,20 @@
     (dron-libre ?d)
 )
 
+(:action mover_dron
+    :parameters (
+        ?d - dron
+        ?from - localizacion
+        ?to - localizacion
+    )
+    :precondition (and 
+        (dron-en ?d ?from)
+    )
+    :effect (and 
+        (not (dron-en ?d ?from))
+        (dron-en ?d ?to)
+    )
+)
 
 (:action coger-caja
     :parameters (
