@@ -244,7 +244,7 @@ def main():
     # You will only use this indirectly,
     # through the flight_cost() function in lab 2.
 
-    """location_coords = setup_location_coords(options)"""
+    #location_coords = setup_location_coords(options)
 
     # Determine which types of content each person needs.
     # If person[0] is "person0",

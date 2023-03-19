@@ -3,14 +3,11 @@
 (define (domain dron-strips)
 
 ;remove requirements that are not needed
-(:requirements :strips :typing )
+(:requirements :strips :typing)
 
 (:types ;todo: enumerate types and their hierarchy here, e.g. car truck bus - vehicle
     dron transportador caja persona localizacion contenido num
 )
-
-; un-comment following line if constants are needed
-;(:constants )
 
 (:predicates ;todo: define predicates here
     (transportador-en ?t - transportador ?l - localizacion)
