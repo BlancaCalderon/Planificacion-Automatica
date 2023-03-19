@@ -354,6 +354,11 @@ def main():
                         f.write("\t(= (fly-cost loc" + str(i) + " deposito) " + str(distance) + ")\n")
                     else:
                         f.write("\t(= (fly-cost loc" + str(i) + " loc" + str(j) + ") " + str(distance) + ")\n")
+                else:
+                    if (i == 0):
+                        f.write("\t(= (fly-cost deposito deposito) 0)\n")
+                    else:
+                        f.write("\t(= (fly-cost loc" + str(i) + " loc" + str(j) + ") 0)\n")
 
         f.write(")\n")
 
