@@ -337,8 +337,6 @@ def main():
 
         for i in drone:
             f.write("\t(dron-libre " + i + ")\n")
-            f.write("\n")
-            f.write("\t(= (total-cost) 0)\n")
 
         f.write("\n")
         for i in range(0, len(location) + 1):
@@ -388,7 +386,6 @@ def main():
                     # with this specific content
 
         f.write("))\n")
-        f.write("(:metric minimize (total-cost))\n")
         f.write(")\n")
 
 if __name__ == '__main__':
