@@ -17,14 +17,14 @@
     (persona-tiene ?p - persona ?ctn - contenido)
 
     (caja-contiene ?c - caja ?ctn - contenido)
-    (caja-disponible ?c)
+    (caja-disponible ?c - caja)
 
     (transportador-contiene ?t - transportador ?c - caja)
     (limite-de ?t - transportador ?n - num)
     (siguiente ?n1 - num ?n2 - num)
 
     (dron-tiene ?d - dron ?c - caja)
-    (dron-libre ?d)
+    (dron-libre ?d - dron)
 )
 
 (:functions
