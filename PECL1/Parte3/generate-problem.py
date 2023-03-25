@@ -374,7 +374,7 @@ def main():
 
         # All Drones should end up at the depot
         for x in drone:
-            f.write("\n")
+            f.write("\t(dron-en " + x + " deposito)\n")
             # TODO: Write a goal that the drone x is at the depot
 
         for x in range(options.persons):
