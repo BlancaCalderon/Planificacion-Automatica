@@ -23,18 +23,34 @@
                 ((libre ?b) (persona-tiene ?p ?ct) (caja-en ?c ?l))
         )
 
-        (method (enviar-todo ?d ?b ?c ?ct ?p ?form ?to)
+		(:method (enviar-todo)
+			((persona-necesita ?p ?ct))
+			(
+				(realizar-entrega ?p ?ct)
+				(enviar-todo)
+			)
+			
+			()
+			()
+		)
 
-                ((DRON ?d) (BRAZO ?b) (CAJA ?c) (CONTENIDO ?ct) (LOCALIZACION ?l) )
-                (
-                        (coger-caja)
-                        (mover-dron)
-                        (entregar-caja)
-                        (mover-caja)
-                )
+		(:method (realizar-entrega ?p ?ct)
+			(
+				(caja-contiene ?c ?ct) 
+				(persona-en ?p ?l)
+				(dron-en ?d deposito)
+				(dron-tiene ?d ?b)
+			)
+			(
+				(!coger-caja ?d ?b ?c ?ct deposito)
+				(!mover-dron ?d deposito ?l)
+				(!entregar-caja ?d ?b ?c ?ct ?l ?p)
+				(!mover-dron ?d ?l deposito)
+			)
+			
+		)
 
-                ()
-                (enviar-todo)
-        
-        )
+		
+
 ))
+
