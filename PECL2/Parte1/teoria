@@ -1,0 +1,49 @@
+(defdomain viaje-simple (
+    
+(:operator (!andar ?a ?x ?y)
+((AGENTE ?a) (LUGAR ?x) (LUGAR ?y) (loc ?a ?x)) ;prec
+((loc ?a ?x)) ;delete
+((loc ?a ?y))) ;add
+
+(:operator (!llamar-taxi ?a ?x)
+((AGENTE ?a)(LUGAR ?x)(loc taxi ?y)) ;prec
+((loc taxi ?y)) ;delete
+((loc taxi ?x))) ;add
+
+(:operator (!conducir-taxi ?a ?x ?y)
+(;prec
+(AGENTE ?a) (LUGAR ?x) (LUGAR ?y)
+(loc taxi ?x) (loc ?a ?x)
+(deuda ?a ?o) (dist ?x ?y ?d)
+)(;delete
+(loc taxi ?x) (loc ?a ?x)
+(deuda ?a ?o)
+)(;add
+(loc taxi ?y) (loc ?a ?y)
+(deuda ?a (call + 1.5 (call * 0.5 ?d))
+)
+
+(:operator (!pagar-taxi ?a)
+((AGENTE ?a) (dinero ?a ?t) (deuda ?a ?d) (call > ?t ?d))
+((dinero ?a ?t) (deuda ?a ?d)) ;delete
+((dinero ?a (call – ?t ?d)) (deuda ?a 0)) ;add
+
+
+(method (viajar ?a ?x ?y)
+(;prec viajar-andando
+(dist ?x ?y ?d) (call <= ?d 4)
+)
+(;subtareas viajar-andando
+(!andar ?a ?x ?y)
+)
+(;prec viajar-en-taxi
+(dist ?x ?y ?d) (dinero ?a ?t)
+(call > ?t (call + 1.5 (call * 0.5 ?d)))
+)
+(;subtareas viajar-en-taxi
+(!llamar-taxi ?a ?x)
+(!conducir-taxi ?a ?x ?y)
+(!pagar-taxi ?a ?x ?y)
+)
+)
+)))));final defdomain
