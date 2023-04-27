@@ -1,0 +1,102 @@
+(defdomain drone (
+	(:operator (!mover-dron ?d ?from ?to)
+		(
+			(DRON ?d) 
+			(LOCALIZACION ?from) 
+			(LOCALIZACION ?to) 
+			(dron-en ?d ?from)
+		) 
+		((dron-en ?d ?from))
+		((dron-en ?d ?to))            
+	)
+
+	(:operator (!coger-caja ?d ?b ?c ?ct ?l)
+		(
+			(DRON ?d) 
+			(BRAZO ?b) 
+			(CAJA ?c) 
+			(CONTENIDO ?ct) 
+			(LOCALIZACION ?l) 
+			(dron-en ?d ?l) 
+			(caja-en ?c ?l) 
+			(caja-contiene ?c ?ct) 
+			(dron-tiene ?d ?b) 
+			(libre ?b)
+		)
+		(
+			(caja-en ?c ?l) 
+			(libre ?b)
+		)
+		((brazo-tiene ?b ?c))
+	)
+
+	(:operator (!dejar-caja ?d ?b ?c ?l)
+		(
+			(DRON ?d) 
+			(BRAZO ?b) 
+			(CAJA ?c) 
+			(LOCALIZACION ?l) 
+			(dron-en ?d ?l) 
+			(dron-tiene ?d ?b) 
+			(brazo-tiene ?b ?c)
+		)
+		((brazo-tiene ?b ?c))
+		(
+			(libre ?b) 
+			(caja-en ?c ?l)
+		)
+	)
+
+	(:operator (!entregar-caja ?d ?b ?c ?ct ?l ?p)
+		(
+			(DRON ?d) 
+			(BRAZO ?b) 
+			(CAJA ?c) 
+			(CONTENIDO ?ct) 
+			(LOCALIZACION ?l) 
+			(PERSONA ?p) 
+			(dron-en ?d ?l) 
+			(dron-tiene ?d ?b) 
+			(persona-en ?p ?l) 
+			(brazo-tiene ?b ?c) 
+			(caja-contiene ?c ?ct)
+		)
+		(
+			(persona-necesita ?p ?ct) 
+			(brazo-tiene ?b ?c) 
+			(caja-contiene ?c ?ct)
+		)
+		(
+			(libre ?b) 
+			(persona-tiene ?p ?ct) 
+			(caja-en ?c ?l)
+		)
+	)
+
+	(:method (enviar-todo)
+		((persona-necesita ?p ?ct))
+		(
+			(realizar-entrega ?p ?ct)
+			(enviar-todo)
+		)
+		
+		()
+		()
+	)
+
+	(:method (realizar-entrega ?p ?ct)
+		(
+			(caja-contiene ?c ?ct) 
+			(persona-en ?p ?l)
+			(dron-en ?d deposito)
+			(dron-tiene ?d ?b)
+		)
+		(
+			(!coger-caja ?d ?b ?c ?ct deposito)
+			(!mover-dron ?d deposito ?l)
+			(!entregar-caja ?d ?b ?c ?ct ?l ?p)
+			(!mover-dron ?d ?l deposito)
+		)
+	)
+))
+
