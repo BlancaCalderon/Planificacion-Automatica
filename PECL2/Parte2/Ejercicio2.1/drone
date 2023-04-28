@@ -9,6 +9,7 @@
         )
         ((dron-en ?d ?from))
         ((dron-en ?d ?to))
+        50
     )
 
 	(:operator (!coger-contenido ?d ?ct ?l)
@@ -28,6 +29,7 @@
 			(dron-tiene ?d ?ct)
 			(loc-tiene ?l ?ct (call - ?n 1))
 		)
+		0
 	)
 	
 	(:operator (!entregar-contenido ?d ?ct ?l)
@@ -47,6 +49,7 @@
 			(loc-necesita ?l ?ct (call - ?n 1))
 			(dron-libre ?d)
 		)
+		0
 	)
 	
 	(:operator (!mover-transportador ?d ?t ?from ?to)
@@ -57,6 +60,7 @@
 			(LOCALIZACION ?to)
 			(dron-en ?d ?from)
 			(transportador-en ?t ?from)
+			(limite-transportador ?t ?n)
 			(dron-libre ?d)
 		)
 		(
@@ -67,6 +71,7 @@
 			(dron-en ?d ?to)
 			(transportador-en ?t ?to)
 		)
+		(call + 50 (call / ?n 2))
 	)
 	
 	(:operator (!coger-de-transportador ?d ?t ?ct ?l)
@@ -91,6 +96,7 @@
 			(transportador-tiene ?t ?ct (call - ?n 1))
 			(capacidad-transportador ?t (call + ?m 1))
 		)
+		0
 	)
 	
 	(:operator (!dejar-en-transportador ?d ?t ?ct ?l)
@@ -115,6 +121,7 @@
 			(transportador-tiene ?t ?ct (call + ?n 1))
 			(capacidad-transportador ?t (call - ?m 1))
 		)
+		0
 	)
 	
 	(:method (realizar-entrega ?l ?ct ?n)
