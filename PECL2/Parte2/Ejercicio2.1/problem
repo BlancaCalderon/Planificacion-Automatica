@@ -9,28 +9,31 @@
 	(LOCALIZACION loc3)
 	(CONTENIDO comida)
 	(CONTENIDO medicina)
-	
-	(limite-transportador transportador1 5)
-	(limite-transportador transportador2 5)
-	
-	(capacidad-transportador transportador1 5)
-	(capacidad-transportador transportador2 5)
+
+	(limite-transportador transportador1 10)
+	(limite-transportador transportador2 20)
+	(capacidad-transportador transportador1 10)
+	(capacidad-transportador transportador2 20)
 	(transportador-tiene transportador1 comida 0)
 	(transportador-tiene transportador1 medicina 0)
 	(transportador-tiene transportador2 comida 0)
 	(transportador-tiene transportador2 medicina 0)
-	
+
 	(dron-en dron1 deposito)
+
 	(transportador-en transportador1 deposito)
 	(transportador-en transportador2 deposito)
-	
-	(loc-tiene deposito medicina 5)
-	(loc-tiene deposito comida 5)
-	
-	(loc-necesita loc1 medicina 3)
-	(loc-necesita loc1 comida 3)
-	
+
+	(loc-necesita localizacion1 comida 1)
+	(loc-necesita localizacion1 medicina 9)
+	(loc-necesita localizacion2 comida 6)
+	(loc-necesita localizacion2 medicina 14)
+
+	(loc-tiene deposito comida 7)
+	(loc-tiene deposito medicina 23)
+
 	(dron-libre dron1)
+
 )
 (
 	(enviar-todo)

@@ -158,9 +158,9 @@ def main():
 
     parser = OptionParser(usage='python generator.py [-help] options...')
     parser.add_option('-d', '--drones', metavar='NUM', dest='drones', action='store', type=int, help='the number of drones')
-    parser.add_option('-r', '--carriers', metavar='NUM', type=int, dest='carriers',
+    parser.add_option('-r', '--carriers', metavar='NUM', type=str, dest='carriers',
                       help='the number of carriers, for later labs; use 0 for no carriers')
-    parser.add_option('-l', '--locations', metavar='NUM', type=int, dest='locations',
+    parser.add_option('-l', '--locations', metavar='NUM', type=str, dest='locations',
                       help='the number of locations apart from the depot ')
     parser.add_option('-p', '--persons', metavar='NUM', type=int, dest='persons', help='the number of persons')
     parser.add_option('-c', '--crates', metavar='NUM', type=int, dest='crates', help='the number of crates available')
@@ -213,6 +213,8 @@ def main():
     print("Goals\t\t", options.goals)
 
     # Setup all lists of objects
+    lim_transportador = options.carriers.split(', ')
+    cajas_loc = options.locations.split(', ')
 
     # These lists contain the names of all Drones, locations, and so on.
 
@@ -222,12 +224,14 @@ def main():
     carrier = []
     location = []
 
-    for x in range(options.locations):
+    print(options.locations)
+
+    for x in range(len(cajas_loc)):
         location.append("loc" + str(x + 1))
     for x in range(options.drones):
         drone.append("dron" + str(x + 1))
-    for x in range(options.carriers):
-        carrier.append("carrier" + str(x + 1))
+    for x in range(len(lim_transportador)):
+        carrier.append("transportador" + str(x + 1))
     for x in range(options.persons):
         person.append("persona" + str(x + 1))
     for x in range(options.crates):
@@ -305,56 +309,69 @@ def main():
         for x in drone:
             f.write("\t(DRON " + x + ")\n")
 
-        for i in range(len(drone) * 2):
-            f.write("\t(BRAZO brazo" + str(i + 1) + ")\n" )
+        for x in carrier:
+            f.write("\t(TRANSPORTADOR " + x + ")\n")
 
         f.write("\t(LOCALIZACION deposito)\n")
         for x in location:
             f.write("\t(LOCALIZACION " + x + ")\n")
 
-        for x in crate:
-            f.write("\t(CAJA " + x + ")\n")
-
         for x in content_types:
             f.write("\t(CONTENIDO " + x + ")\n")
-
-        for x in person:
-            f.write("\t(PERSONA " + x + ")\n")
         f.write("\n")
         
         #Inicializar localizaciones de los objetos
+        for i in range(len(lim_transportador)):
+            f.write("\t(limite-transportador transportador" + str(i + 1) + " " + lim_transportador[i] + ")\n")
+
+        for i in range(len(lim_transportador)):
+            f.write("\t(capacidad-transportador transportador" + str(i + 1) + " " + lim_transportador[i] + ")\n")
+
+        for i in range(len(lim_transportador)):
+            for j in range(2):
+                f.write("\t(transportador-tiene transportador" + str(i + 1) + " " + content_types[j] + " 0)\n")
+        f.write("\n")
+
         for i in drone:
             f.write("\t(dron-en " + i + " deposito)\n")
-        for i in crate:
-            f.write("\t(caja-en " + i + " deposito)\n")
-        for i in person:
-            f.write("\t(persona-en " + i + " " + random.choice(location) + ")\n")
+        f.write("\n")
+
+        for i in range(len(lim_transportador)):
+            f.write("\t(transportador-en transportador" + str(i + 1) + " deposito)\n")
+        f.write("\n")
+
+        sum_contenido = [0, 0]
+
+        for i in range(len(lim_transportador)):
+            comida = random.randrange(int(lim_transportador[i]))
+            f.write("\t(loc-necesita localizacion" + str(i + 1) + " comida " + str(comida) + ")\n")
+            medicina = int(lim_transportador[i]) - comida
+            f.write("\t(loc-necesita localizacion" + str(i + 1) + " medicina " + str(medicina) + ")\n")
+            sum_contenido[0] += comida
+            sum_contenido[1] += medicina
+        f.write("\n")
+
+        for i in range(2):
+            f.write("\t(loc-tiene deposito " + content_types[i] + " " + str(sum_contenido[i]) + ")\n")
+        f.write("\n")
+
+        f.write("\t(dron-libre dron1)\n")
         f.write("\n")
 
         #Inicializar contenido de las cajas
-        for i in range(len(crates_with_contents)):
+        '''for i in range(len(crates_with_contents)):
             for j in crates_with_contents[i]:
                 f.write("\t(caja-contiene " + j + " " + content_types[i] + ")\n")
-        f.write("\n")
+        f.write("\n")'''
 
         #Inicializar lo que necesita una persona
-        for i in range(len(person)):
+        '''for i in range(len(person)):
             for j in range(len(content_types)):
                 if (need[i][j] == True):
                     f.write("\t(persona-necesita persona" + str(i + 1) + " " + content_types[j] + ")\n")
-        f.write("\n")
+        f.write("\n")'''
             
         #Inicializar brazos del dron
-        num = 1
-        for i in drone:
-            for _ in range(2):
-                f.write("\t(dron-tiene " + i + " brazo" + str(num) + ")\n")
-                num += 1
-        num = 1
-        for i in drone:
-            for _ in range(2):
-                f.write("\t(libre " + " brazo" + str(num) + ")\n")
-                num += 1
 
         f.write(")\n")
 
