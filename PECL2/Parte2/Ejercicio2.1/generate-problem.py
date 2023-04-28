@@ -344,9 +344,9 @@ def main():
 
         for i in range(len(lim_transportador)):
             comida = random.randrange(int(lim_transportador[i]))
-            f.write("\t(loc-necesita localizacion" + str(i + 1) + " comida " + str(comida) + ")\n")
+            f.write("\t(loc-necesita loc" + str(i + 1) + " comida " + str(comida) + ")\n")
             medicina = int(lim_transportador[i]) - comida
-            f.write("\t(loc-necesita localizacion" + str(i + 1) + " medicina " + str(medicina) + ")\n")
+            f.write("\t(loc-necesita loc" + str(i + 1) + " medicina " + str(medicina) + ")\n")
             sum_contenido[0] += comida
             sum_contenido[1] += medicina
         f.write("\n")

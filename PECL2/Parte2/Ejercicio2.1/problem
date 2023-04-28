@@ -24,13 +24,13 @@
 	(transportador-en transportador1 deposito)
 	(transportador-en transportador2 deposito)
 
-	(loc-necesita localizacion1 comida 1)
-	(loc-necesita localizacion1 medicina 9)
-	(loc-necesita localizacion2 comida 6)
-	(loc-necesita localizacion2 medicina 14)
+	(loc-necesita loc1 comida 2)
+	(loc-necesita loc1 medicina 8)
+	(loc-necesita loc2 comida 19)
+	(loc-necesita loc2 medicina 1)
 
-	(loc-tiene deposito comida 7)
-	(loc-tiene deposito medicina 23)
+	(loc-tiene deposito comida 21)
+	(loc-tiene deposito medicina 9)
 
 	(dron-libre dron1)
 
