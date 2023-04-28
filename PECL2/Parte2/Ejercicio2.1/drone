@@ -1,102 +1,195 @@
 (defdomain drone (
-	(:operator (!mover-dron ?d ?from ?to)
+
+    (:operator (!mover-dron ?d ?from ?to)
+        (
+            (DRON ?d)
+            (LOCALIZACION ?to)
+            (LOCALIZACION ?from)
+            (dron-en ?d ?from)
+        )
+        ((dron-en ?d ?from))
+        ((dron-en ?d ?to))
+    )
+
+	(:operator (!coger-contenido ?d ?ct ?l)
 		(
-			(DRON ?d) 
-			(LOCALIZACION ?from) 
-			(LOCALIZACION ?to) 
+			(DRON ?d)
+			(CONTENIDO ?ct) 
+			(LOCALIZACION ?l) 
+			(dron-en ?d ?l) 
+			(loc-tiene ?l ?ct ?n)
+			(dron-libre ?d)
+		)
+		( 
+			(dron-libre ?d)
+			(loc-tiene ?l ?ct ?n)
+		)
+		(
+			(dron-tiene ?d ?ct)
+			(loc-tiene ?l ?ct (call - ?n 1))
+		)
+	)
+	
+	(:operator (!entregar-contenido ?d ?ct ?l)
+		(
+			(DRON ?d)
+			(LOCALIZACION ?l)
+			(CONTENIDO ?ct)
+			(dron-en ?d ?l)
+			(dron-tiene ?d ?ct)
+			(loc-necesita ?l ?ct ?n)
+		)
+		(
+			(dron-tiene ?d ?ct)
+			(loc-necesita ?l ?ct ?n)
+		)
+		(
+			(loc-necesita ?l ?ct (call - ?n 1))
+			(dron-libre ?d)
+		)
+	)
+	
+	(:operator (!mover-transportador ?d ?t ?from ?to)
+		(
+			(DRON ?d)
+			(TRANSPORTADOR ?t)
+			(LOCALIZACION ?from)
+			(LOCALIZACION ?to)
 			(dron-en ?d ?from)
-		) 
-		((dron-en ?d ?from))
-		((dron-en ?d ?to))            
-	)
-
-	(:operator (!coger-caja ?d ?b ?c ?ct ?l)
-		(
-			(DRON ?d) 
-			(BRAZO ?b) 
-			(CAJA ?c) 
-			(CONTENIDO ?ct) 
-			(LOCALIZACION ?l) 
-			(dron-en ?d ?l) 
-			(caja-en ?c ?l) 
-			(caja-contiene ?c ?ct) 
-			(dron-tiene ?d ?b) 
-			(libre ?b)
+			(transportador-en ?t ?from)
+			(dron-libre ?d)
 		)
 		(
-			(caja-en ?c ?l) 
-			(libre ?b)
+			(dron-en ?d ?from)
+			(transportador-en ?t ?from)
 		)
-		((brazo-tiene ?b ?c))
-	)
-
-	(:operator (!dejar-caja ?d ?b ?c ?l)
 		(
-			(DRON ?d) 
-			(BRAZO ?b) 
-			(CAJA ?c) 
-			(LOCALIZACION ?l) 
-			(dron-en ?d ?l) 
-			(dron-tiene ?d ?b) 
-			(brazo-tiene ?b ?c)
-		)
-		((brazo-tiene ?b ?c))
-		(
-			(libre ?b) 
-			(caja-en ?c ?l)
+			(dron-en ?d ?to)
+			(transportador-en ?t ?to)
 		)
 	)
-
-	(:operator (!entregar-caja ?d ?b ?c ?ct ?l ?p)
+	
+	(:operator (!coger-de-transportador ?d ?t ?ct ?l)
 		(
-			(DRON ?d) 
-			(BRAZO ?b) 
-			(CAJA ?c) 
-			(CONTENIDO ?ct) 
-			(LOCALIZACION ?l) 
-			(PERSONA ?p) 
-			(dron-en ?d ?l) 
-			(dron-tiene ?d ?b) 
-			(persona-en ?p ?l) 
-			(brazo-tiene ?b ?c) 
-			(caja-contiene ?c ?ct)
+			(DRON ?d)
+			(TRANSPORTADOR ?t)
+			(CONTENIDO ?ct)
+			(LOCALIZACION ?l)
+			(dron-en ?d ?l)
+			(transportador-en ?t ?l)
+			(transportador-tiene ?t ?ct ?n)
+			(capacidad-transportador ?t ?m)
+			(dron-libre ?d)
 		)
 		(
-			(persona-necesita ?p ?ct) 
-			(brazo-tiene ?b ?c) 
-			(caja-contiene ?c ?ct)
+			(dron-libre ?d)
+			(transportador-tiene ?t ?ct ?n)
+			(capacidad-transportador ?t ?m)
 		)
 		(
-			(libre ?b) 
-			(persona-tiene ?p ?ct) 
-			(caja-en ?c ?l)
+			(dron-tiene ?d ?ct)
+			(transportador-tiene ?t ?ct (call - ?n 1))
+			(capacidad-transportador ?t (call + ?m 1))
 		)
 	)
-
+	
+	(:operator (!dejar-en-transportador ?d ?t ?ct ?l)
+		(
+			(DRON ?d)
+			(TRANSPORTADOR ?t)
+			(CONTENIDO ?ct)
+			(LOCALIZACION ?l)
+			(dron-en ?d ?l)
+			(transportador-en ?t ?l) 
+			(dron-tiene ?d ?ct)
+			(transportador-tiene ?t ?ct ?n)
+			(capacidad-transportador ?t ?m)
+		)
+		(
+			(dron-tiene ?d ?ct)
+			(transportador-tiene ?t ?ct ?n)
+			(capacidad-transportador ?t ?m)
+		)
+		(
+			(dron-libre ?d)
+			(transportador-tiene ?t ?ct (call + ?n 1))
+			(capacidad-transportador ?t (call - ?m 1))
+		)
+	)
+	
+	(:method (realizar-entrega ?l ?ct ?n)
+		;Solo
+		(
+			(call >= 1 ?n)
+			(dron-en ?d ?loc)
+		)
+		(
+			(!coger-contenido ?d ?ct ?loc)
+			(!mover-dron ?d ?loc ?l)
+			(!entregar-contenido ?d ?ct ?l)
+			(!mover-dron ?d ?l ?loc)
+		)
+		
+		;No solo
+		(
+			(dron-en ?d ?loc)
+			(transportador-en ?t ?loc)
+		)
+		(
+			(cargar-transportador ?ct ?n ?t)
+			(!mover-transportador ?d ?t ?loc ?l)
+			(realizar-entrega ?d ?t ?ct ?n)
+			(!mover-transportador ?d ?t ?l ?loc)
+		)
+	)
+	
+	(:method (realizar-entrega ?d ?t ?ct ?n)
+		(
+			(call > ?n 0)
+			(dron-en ?d ?l)
+		)
+		(
+			(!coger-de-transportador ?d ?t ?ct ?l)
+			(!entregar-contenido ?d ?ct ?l)
+			(realizar-entrega ?d ?t ?ct (call - ?n 1))
+		)
+		
+		(call >= 0 ?n)
+		()
+	)
+	
+	(:method (cargar-transportador ?ct ?n ?t)
+		(
+			(loc-tiene ?loc ?ct ?restantes)
+			(call > ?restantes 0)
+			(capacidad-transportador ?t ?capa)
+			(call >= ?capa ?n)
+			(call > ?n 0)
+			(dron-en ?d ?loc)
+		)
+		(
+			(!coger-contenido ?d ?ct ?loc)
+			(!dejar-en-transportador ?d ?t ?ct ?loc)
+			(cargar-transportador ?ct (call - ?n 1) ?t)
+		)
+		
+		(call >= 0 ?n)
+		()
+	)
+	
 	(:method (enviar-todo)
-		((persona-necesita ?p ?ct))
 		(
-			(realizar-entrega ?p ?ct)
+			(loc-necesita ?l ?ct ?n)
+			(call > ?n 0)
+		)
+		(
+			(realizar-entrega ?l ?ct ?n)
 			(enviar-todo)
 		)
 		
 		()
 		()
 	)
-
-	(:method (realizar-entrega ?p ?ct)
-		(
-			(caja-contiene ?c ?ct) 
-			(persona-en ?p ?l)
-			(dron-en ?d deposito)
-			(dron-tiene ?d ?b)
-		)
-		(
-			(!coger-caja ?d ?b ?c ?ct deposito)
-			(!mover-dron ?d deposito ?l)
-			(!entregar-caja ?d ?b ?c ?ct ?l ?p)
-			(!mover-dron ?d ?l deposito)
-		)
-	)
+	
 ))
 
