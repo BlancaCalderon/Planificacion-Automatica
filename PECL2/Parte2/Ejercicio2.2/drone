@@ -1,5 +1,9 @@
 (defdomain drone (
 
+	;---------------------------------------------------------------------------
+	;Operaciones
+	;---------------------------------------------------------------------------
+	
     (:operator (!mover-dron ?d ?from ?to)
         (
             (DRON ?d)
@@ -128,8 +132,10 @@
 		0
 	)
 	
-	;------------------------------------------------------------------------------------
-
+	;---------------------------------------------------------------------------
+	;Metodos
+	;---------------------------------------------------------------------------
+	
 	(:method (realizar-entrega ?l ?n)
 		;Solo
 		(
@@ -146,9 +152,29 @@
 		)
 		
 		;No solo
+		;Igual
 		(
-			(dron-en ?d ?loc)
-			(transportador-en ?t ?loc)
+			:sort-by ?lim > (and (dron-en ?d ?loc) (transportador-en ?t ?loc) (limite-transportador ?t ?lim) (call = ?lim ?n))
+		)
+		(
+			(cargar ?t ?l)
+			(!mover-transportador ?d ?t ?loc ?l)
+			(entregar ?t)
+			(!mover-transportador ?d ?t ?l ?loc)
+		)
+		;Mayor
+		(
+			:sort-by ?lim > (and (dron-en ?d ?loc) (transportador-en ?t ?loc) (limite-transportador ?t ?lim) (call > ?lim ?n))
+		)
+		(
+			(cargar ?t ?l)
+			(!mover-transportador ?d ?t ?loc ?l)
+			(entregar ?t)
+			(!mover-transportador ?d ?t ?l ?loc)
+		)
+		;Menor
+		(
+			:sort-by ?lim > (and (dron-en ?d ?loc) (transportador-en ?t ?loc) (limite-transportador ?t ?lim))
 		)
 		(
 			(cargar ?t ?l)
@@ -233,8 +259,7 @@
 	
 	(:method (enviar-todo)
 		(
-			(loc-total-necesita ?l ?n)
-			(call > ?n 0)
+			:sort-by ?n > (and (loc-total-necesita ?l ?n) (call > ?n 0))
 		)
 		(
 			(realizar-entrega ?l ?n)
